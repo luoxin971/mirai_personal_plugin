@@ -6,3 +6,6 @@
 /out/
 /run/
 /debug-sandbox
+*.log
+/bots/
+/logs/
