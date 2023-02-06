@@ -6,8 +6,8 @@ import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.message.data.Message;
 import org.luoxin971.mirai.plugin.command.WeatherCommand;
 import org.luoxin971.mirai.plugin.component.music.MusicShare;
-import org.luoxin971.mirai.plugin.config.CommonConfig;
-import org.luoxin971.mirai.plugin.config.ScheduleConfig;
+import org.luoxin971.mirai.plugin.config.CommonConstant;
+import org.luoxin971.mirai.plugin.config.ScheduleConstant;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,19 +32,20 @@ public class ScheduleAction {
 
     sleepSchedule = new ConcurrentHashMap<>();
     sleepSchedule.put(
-        "睡觉", new ArrayList<>(Arrays.asList(CommonConfig.XIN_QQ_NUM, CommonConfig.GRACE_QQ_NUM)));
+        "睡觉",
+        new ArrayList<>(Arrays.asList(CommonConstant.XIN_QQ_NUM, CommonConstant.GRACE_QQ_NUM)));
     getUpSchedule = new ConcurrentHashMap<>();
     getUpSchedule.put(
         "起床",
         new ArrayList<>(
             Arrays.asList(
-                Map.entry(CommonConfig.XIN_QQ_NUM, "广州"),
-                Map.entry(CommonConfig.GRACE_QQ_NUM, "广州"))));
+                Map.entry(CommonConstant.XIN_QQ_NUM, "深圳"),
+                Map.entry(CommonConstant.GRACE_QQ_NUM, "广州"))));
 
     try {
       CronUtil.schedule(
           "睡觉",
-          ScheduleConfig.GOOD_NIGHT_CRON,
+          ScheduleConstant.GOOD_NIGHT_CRON,
           () -> {
             List<Bot> botList = Bot.getInstances();
             log.info("botList size: " + botList.size() + "content: " + botList);
@@ -67,7 +68,7 @@ public class ScheduleAction {
     try {
       CronUtil.schedule(
           "起床",
-          ScheduleConfig.GOOD_MORNING_CRON,
+          ScheduleConstant.GOOD_MORNING_CRON,
           () -> {
             List<Bot> botList = Bot.getInstances();
             log.info("botList size: " + botList.size() + "content: " + botList);

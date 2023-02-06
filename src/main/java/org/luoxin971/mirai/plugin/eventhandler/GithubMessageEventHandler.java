@@ -12,7 +12,7 @@ import net.mamoe.mirai.message.data.LightApp;
 import net.mamoe.mirai.message.data.PlainText;
 import org.kohsuke.github.GHIssue;
 import org.luoxin971.mirai.plugin.component.github.GithubUtil;
-import org.luoxin971.mirai.plugin.config.CommonConfig;
+import org.luoxin971.mirai.plugin.config.CommonConstant;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -27,11 +27,12 @@ import static org.luoxin971.mirai.plugin.JavaPluginMain.log;
  */
 public class GithubMessageEventHandler extends SimpleListenerHost {
 
+  /** 监听私聊消息 */
   @EventHandler
   public ListeningStatus onFriendMessage(FriendMessageEvent event) {
     log.info(event.getMessage().serializeToMiraiCode());
     // 如果不是本人发的，就忽略
-    if (!CommonConfig.XIN_QQ_NUM.equals(event.getSender().getId())) {
+    if (!CommonConstant.XIN_QQ_NUM.equals(event.getSender().getId())) {
       return ListeningStatus.LISTENING;
     }
     String url = getUrl(event);
@@ -46,10 +47,8 @@ public class GithubMessageEventHandler extends SimpleListenerHost {
     return ListeningStatus.LISTENING;
   }
 
+  /** 从 event 中获取 url，若非有效 url，则返回 null */
   private String getUrl(MessageEvent event) {
-
-    log.info("event mirai code: \n" + event.getMessage().serializeToMiraiCode());
-
     if (Objects.nonNull(event.getMessage().get(LightApp.Key))) {
       String content = event.getMessage().get(LightApp.Key).getContent();
       JsonObject jo = JsonParser.parseString(content).getAsJsonObject();
@@ -73,7 +72,6 @@ public class GithubMessageEventHandler extends SimpleListenerHost {
         return url;
       }
     }
-    log.info("不是url");
     return null;
   }
 

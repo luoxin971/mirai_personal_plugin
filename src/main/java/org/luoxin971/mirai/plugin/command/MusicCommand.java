@@ -24,7 +24,7 @@ public final class MusicCommand extends JRawCommand {
 
   public MusicCommand() {
     super(JavaPluginMain.INSTANCE, "music", "m");
-    setUsage("/music <歌曲名>");
+    setUsage("/m <歌曲名> 点歌");
     setDescription("点歌");
     setPrefixOptional(true);
   }

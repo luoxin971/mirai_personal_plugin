@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.kohsuke.github.GHIssue;
 import org.luoxin971.mirai.plugin.JavaPluginMain;
 import org.luoxin971.mirai.plugin.component.github.GithubUtil;
-import org.luoxin971.mirai.plugin.config.CommonConfig;
+import org.luoxin971.mirai.plugin.config.CommonConstant;
 import org.luoxin971.mirai.plugin.eventhandler.GithubMessageEventHandler;
 
 import java.util.stream.Collectors;
@@ -31,14 +31,14 @@ public class GithubCommand extends JRawCommand {
   public GithubCommand() {
     super(JavaPluginMain.INSTANCE, "github", "g");
     setDescription("github api");
-    setUsage("/g <>");
+    setUsage("/g <> <> github api");
     setPrefixOptional(true);
   }
 
   @Override
   @SneakyThrows
   public void onCommand(@NotNull CommandContext context, @NotNull MessageChain args) {
-    if (!CommonConfig.XIN_QQ_NUM.equals(context.getSender().getUser().getId())) {
+    if (!CommonConstant.XIN_QQ_NUM.equals(context.getSender().getUser().getId())) {
       return;
     }
     int size = args.size();

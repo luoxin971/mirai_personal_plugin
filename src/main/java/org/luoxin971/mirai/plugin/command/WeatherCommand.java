@@ -11,7 +11,7 @@ import org.luoxin971.mirai.plugin.component.weather.ForecastReq;
 import org.luoxin971.mirai.plugin.component.weather.ForecastRes;
 import org.luoxin971.mirai.plugin.component.weather.WeatherForecastConfig;
 import org.luoxin971.mirai.plugin.component.weather.WeatherUtil;
-import org.luoxin971.mirai.plugin.config.CommonConfig;
+import org.luoxin971.mirai.plugin.config.CommonConstant;
 
 import java.io.File;
 import java.util.Objects;
@@ -34,7 +34,7 @@ public final class WeatherCommand extends JRawCommand {
   public WeatherCommand() {
     super(JavaPluginMain.INSTANCE, "天气", "weather", "w");
     setDescription("获取当前天气");
-    setUsage("/w <城市名>");
+    setUsage("/w <县市区名> 获取当前天气");
     setPrefixOptional(true);
   }
 
@@ -51,7 +51,7 @@ public final class WeatherCommand extends JRawCommand {
 
   public Message forecast(String city, Contact contact) {
     if ((Objects.isNull(city) || city.isBlank() || city.isEmpty())
-        && !CommonConfig.XIN_QQ_NUM.equals(contact.getId())) {
+        && !CommonConstant.XIN_QQ_NUM.equals(contact.getId())) {
       city = "广州";
     }
     ForecastRes res =

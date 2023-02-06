@@ -57,14 +57,10 @@ public final class TopHotCommand extends JRawCommand {
   public TopHotCommand() {
     super(JavaPluginMain.INSTANCE, "热点", "hot", "h");
     setDescription("热点");
-    setUsage("/h <内容平台缩写>");
+    setUsage("/h <内容平台缩写> 获取平台热点内容");
     setPrefixOptional(true);
   }
 
-  /**
-   * @param context
-   * @param args
-   */
   @Override
   @SneakyThrows
   public void onCommand(@NotNull CommandContext context, @NotNull MessageChain args) {
@@ -109,6 +105,13 @@ public final class TopHotCommand extends JRawCommand {
             .orElse(new QuoteReply(context.getOriginalMessage()).plus("无法查询！")));
   }
 
+  /**
+   * 获取热点list
+   *
+   * @param doc html
+   * @param nodeId 平台nodeid
+   * @return
+   */
   public List<Map.Entry<String, String>> jsoup(Document doc, Integer nodeId) {
     List<Map.Entry<String, String>> list = new ArrayList<>();
     Element wb = doc.getElementById("node-" + nodeId);

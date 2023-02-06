@@ -6,7 +6,7 @@ package org.luoxin971.mirai.plugin.config;
  * @author: xin
  * @since: 2023/2/4
  */
-public class ScheduleConfig {
+public class ScheduleConstant {
   public static final String GOOD_NIGHT_CRON = "0 30 22 * * *";
 
   public static final String GOOD_MORNING_CRON = "0 30 6 * * *";
