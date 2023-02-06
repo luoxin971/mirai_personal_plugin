@@ -32,8 +32,9 @@ public final class WeatherCommand extends JRawCommand {
   private static final String ICON_PATH = JavaPluginMain.INSTANCE.getDataFolderPath() + "/wea_img/";
 
   public WeatherCommand() {
-    super(JavaPluginMain.INSTANCE, "天气", "weather");
+    super(JavaPluginMain.INSTANCE, "天气", "weather", "w");
     setDescription("获取当前天气");
+    setUsage("/w <城市名>");
     setPrefixOptional(true);
   }
 

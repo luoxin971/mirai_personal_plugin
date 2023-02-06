@@ -50,8 +50,9 @@ public final class TopHotCommand extends JRawCommand {
   }
 
   public TopHotCommand() {
-    super(JavaPluginMain.INSTANCE, "hot", "h");
+    super(JavaPluginMain.INSTANCE, "热点", "hot", "h");
     setDescription("热点");
+    setUsage("/h <内容平台缩写>");
     setPrefixOptional(true);
   }
 
