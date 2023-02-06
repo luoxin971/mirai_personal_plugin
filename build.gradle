@@ -1,6 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.7.10'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.10'
+//    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.10'
 
     id 'net.mamoe.mirai-console' version '2.13.2'
 //    id 'me.him188.maven-central-publish' version "1.0.0-dev-3"
@@ -17,16 +17,16 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'xyz.cssxsh.mirai:mirai-hibernate-plugin:2.4.4'
     implementation 'cn.hutool:hutool-all:5.8.9'
     implementation 'org.apache.poi:poi-ooxml:4.1.2'
     api 'com.google.code.gson:gson:2.8.6'
     compileOnly 'org.projectlombok:lombok:1.18.26'
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
-    testImplementation 'org.jetbrains.kotlin:kotlin-test:1.7.20'
-    testImplementation 'xyz.cssxsh.mirai:mirai-hibernate-plugin:2.4.4'
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.3'
+    // https://mvnrepository.com/artifact/org.kohsuke/github-api
+    implementation group: 'org.kohsuke', name: 'github-api', version: '1.313'
+
 }
 
 mirai {

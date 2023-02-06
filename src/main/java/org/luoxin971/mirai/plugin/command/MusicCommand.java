@@ -23,7 +23,8 @@ public final class MusicCommand extends JRawCommand {
   public static final MusicCommand INSTANCE = new MusicCommand();
 
   public MusicCommand() {
-    super(JavaPluginMain.INSTANCE, "music");
+    super(JavaPluginMain.INSTANCE, "music", "m");
+    setUsage("/m <歌曲名> 点歌");
     setDescription("点歌");
     setPrefixOptional(true);
   }
