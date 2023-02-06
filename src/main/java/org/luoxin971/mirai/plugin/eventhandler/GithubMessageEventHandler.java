@@ -17,6 +17,8 @@ import org.luoxin971.mirai.plugin.config.CommonConfig;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.luoxin971.mirai.plugin.JavaPluginMain.log;
+
 /**
  * github 监听，不考虑多线程
  *
@@ -25,14 +27,9 @@ import java.util.Optional;
  */
 public class GithubMessageEventHandler extends SimpleListenerHost {
 
-  /** 缓存 issue，以便修改 */
-  public static GHIssue currentIssue;
-
-  /** issue 最近更新时间 */
-  public static long issueUpdateTime = 0;
-
   @EventHandler
   public ListeningStatus onFriendMessage(FriendMessageEvent event) {
+    log.info(event.getMessage().serializeToMiraiCode());
     // 如果不是本人发的，就忽略
     if (!CommonConfig.XIN_QQ_NUM.equals(event.getSender().getId())) {
       return ListeningStatus.LISTENING;
@@ -42,36 +39,52 @@ public class GithubMessageEventHandler extends SimpleListenerHost {
     if (Objects.nonNull(url)) {
       GHIssue issue = GithubUtil.createIssue(url);
       updateIssueCache(issue);
+      log.info("issue: " + GithubUtil.transferIssueToString(issue));
+      event.getSender().sendMessage(GithubUtil.transferIssueToString(issue));
     }
 
-    return ListeningStatus.STOPPED;
+    return ListeningStatus.LISTENING;
   }
 
   private String getUrl(MessageEvent event) {
-    if (Objects.nonNull(event.getMessage().get(PlainText.Key))) {
-      String s = event.getMessage().get(PlainText.Key).contentToString();
-      if (GithubUtil.isHttpUrl(s)) {
-        return s;
-      }
-    } else if (Objects.nonNull(event.getMessage().get(LightApp.Key))) {
+
+    log.info("event mirai code: \n" + event.getMessage().serializeToMiraiCode());
+
+    if (Objects.nonNull(event.getMessage().get(LightApp.Key))) {
       String content = event.getMessage().get(LightApp.Key).getContent();
       JsonObject jo = JsonParser.parseString(content).getAsJsonObject();
-      String url = Optional.ofNullable(jo.get("url")).map(JsonElement::getAsString).orElse("");
+      String url =
+          Optional.ofNullable(jo.get("meta"))
+              .map(JsonElement::getAsJsonObject)
+              .map(x -> x.get("news"))
+              .map(x -> x.getAsJsonObject())
+              .map(x -> x.get("jumpUrl"))
+              .map(JsonElement::getAsString)
+              .orElse("");
       if (GithubUtil.isHttpUrl(url)) {
+        log.info("LightApp url: " + url);
         return url;
       }
     }
+    if (Objects.nonNull(event.getMessage().get(PlainText.Key))) {
+      String url = event.getMessage().get(PlainText.Key).contentToString();
+      if (GithubUtil.isHttpUrl(url)) {
+        log.info("PlainText url: " + url);
+        return url;
+      }
+    }
+    log.info("不是url");
     return null;
   }
 
   /** 更新 issue 缓存 */
-  private static void updateIssueCache() {
+  public static void updateIssueCache() {
     GithubUtil.issueUpdateTime = System.currentTimeMillis();
   }
 
   /** 更新 issue 缓存 */
   private static void updateIssueCache(GHIssue issue) {
-    if (issue.getId() != GithubUtil.currentIssue.getId()) {
+    if (GithubUtil.currentIssue == null || issue.getId() != GithubUtil.currentIssue.getId()) {
       GithubUtil.currentIssue = issue;
     }
     GithubUtil.issueUpdateTime = System.currentTimeMillis();

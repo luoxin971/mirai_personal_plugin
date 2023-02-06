@@ -4,15 +4,20 @@ import lombok.SneakyThrows;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.kohsuke.github.*;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static org.luoxin971.mirai.plugin.JavaPluginMain.log;
 
 /**
  * github api
@@ -37,8 +42,7 @@ public class GithubUtil {
 
   static {
     try {
-      github =
-          GitHubBuilder.fromPropertyFile("github_api/src/main/resources/github.properties").build();
+      github = GitHubBuilder.fromPropertyFile().build();
       repo = github.getRepository("luoxin971/record_db");
       milestoneMap = new ConcurrentHashMap<>(16);
       milestoneMap.put("1-1", "技术干货");
@@ -67,9 +71,24 @@ public class GithubUtil {
     Connection connect = Jsoup.connect(url);
     connect.method(Connection.Method.GET);
     Document document = connect.get();
-    GHIssue issue = repo.createIssue(document.title()).body(url).create();
-    System.out.println(issue);
+    GHIssue issue = repo.createIssue(parseTitle(url, document)).body(url).create();
     return issue;
+  }
+
+  private static String parseTitle(String url, Document document) {
+    String host = null;
+    try {
+      host = new URL(url).getHost();
+    } catch (MalformedURLException e) {
+      return document.title();
+    }
+    // 微信文章的title会是空的
+    Elements elements = document.head().getElementsByAttributeValue("property", "og:title");
+    if ("mp.weixin.qq.com".equalsIgnoreCase(host) && !elements.isEmpty()) {
+      return elements.get(0).attr("content");
+    }
+
+    return document.title().isBlank() ? url : document.title();
   }
 
   @SneakyThrows
@@ -91,20 +110,31 @@ public class GithubUtil {
             .map(
                 x -> {
                   try {
-                    return repo.createLabel(x.toLowerCase(), color);
+                    return repo.listLabels().toList().stream()
+                        .filter(label -> label.getName().equals(x))
+                        .findAny()
+                        .or(
+                            () -> {
+                              try {
+                                return Optional.ofNullable(
+                                    repo.createLabel(x.toLowerCase(), color));
+                              } catch (IOException e) {
+                                log.error("创建label失败: " + x);
+                                throw new RuntimeException(e);
+                              }
+                            })
+                        .get();
                   } catch (IOException e) {
-                    System.out.println("创建label失败");
-                    return null;
+                    throw new RuntimeException(e);
                   }
                 })
             .collect(Collectors.toList());
     issue.addLabels(labels);
-    System.out.println(issue);
-    return issue;
+    return repo.getIssue(issue.getNumber());
   }
 
   /** 检查 issue 最近更新时间是否在 3mins 前 */
-  static boolean checkIssueExpire() {
+  public static boolean checkIssueExpire() {
     return System.currentTimeMillis() - GithubUtil.issueUpdateTime > 3 * 60 * 1000;
   }
 
@@ -163,9 +193,14 @@ public class GithubUtil {
     return mat.matches();
   }
 
-  @SneakyThrows
-  public static void main(String[] args) {
-    GHIssue issue = createIssue("https://blog.csdn.net/weixin_43901865/article/details/112596443");
-    addMetaToIssue(issue, "1-3", Arrays.asList("idea", "maven"));
+  public static String transferIssueToString(GHIssue issue) {
+    return String.format(
+        "number: %s\ntitle: %s\nbody: %s\nurl: %s\nmilestone: %s\nlabels: %s",
+        issue.getNumber(),
+        issue.getTitle(),
+        issue.getBody(),
+        issue.getHtmlUrl(),
+        Optional.ofNullable(issue.getMilestone()).map(GHMilestone::getTitle).orElse(""),
+        issue.getLabels().stream().map(GHLabel::getName).collect(Collectors.joining(", ")));
   }
 }

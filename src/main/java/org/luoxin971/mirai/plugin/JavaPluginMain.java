@@ -17,11 +17,13 @@ import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.utils.MiraiLogger;
 import org.jetbrains.annotations.NotNull;
 import org.luoxin971.mirai.plugin.action.ScheduleAction;
+import org.luoxin971.mirai.plugin.command.GithubCommand;
 import org.luoxin971.mirai.plugin.command.MusicCommand;
 import org.luoxin971.mirai.plugin.command.TopHotCommand;
 import org.luoxin971.mirai.plugin.command.WeatherCommand;
 import org.luoxin971.mirai.plugin.component.weather.WeatherForecastConfig;
 import org.luoxin971.mirai.plugin.component.weather.WeatherForecastData;
+import org.luoxin971.mirai.plugin.eventhandler.GithubMessageEventHandler;
 
 import java.util.Arrays;
 import java.util.List;
@@ -71,9 +73,11 @@ public final class JavaPluginMain extends JavaPlugin {
 
     myCustomPermission.getValue(); // 注册权限
 
+    CommandManager.INSTANCE.registerCommand(GithubCommand.INSTANCE, true);
     CommandManager.INSTANCE.registerCommand(MusicCommand.INSTANCE, true);
     CommandManager.INSTANCE.registerCommand(TopHotCommand.INSTANCE, true);
     CommandManager.INSTANCE.registerCommand(WeatherCommand.INSTANCE, true);
+    eventChannel.registerListenerHost(new GithubMessageEventHandler());
   }
 
   public void handleMessage(FriendMessageEvent event) {
