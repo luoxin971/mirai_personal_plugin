@@ -25,6 +25,8 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
     testImplementation 'org.jetbrains.kotlin:kotlin-test:1.7.20'
     testImplementation 'xyz.cssxsh.mirai:mirai-hibernate-plugin:2.4.4'
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.3'
 }
 
 mirai {
