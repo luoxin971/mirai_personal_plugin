@@ -14,10 +14,12 @@ jobs:
         uses: actions/checkout@v2
       - name: Create pull request
         if: ${{!(endsWith(github.ref, '/master'))}}
-        uses: peter-evans/create-pull-request@v4
+        #        这个 action 搞我，说好 create pr，你却偷偷 merge
+        #        uses: peter-evans/create-pull-request@v4
+        uses: repo-sync/pull-request@v2
         with:
-          branch: master
-          title: "Automated pull request for latest changes"
-          body: "This pull request was automatically created by Github Actions."
-          labels: "auto-generated"
-          token: ${{ secrets.GIT_TOKEN }}
+          destination_branch: master
+          pr_title: "Automated pull request for latest changes ${{github.ref}}"
+          pr_body: "This pull request was automatically created by Github Actions."
+          pr_label: "auto-pr"
+          github_token: ${{ secrets.GIT_TOKEN }}
