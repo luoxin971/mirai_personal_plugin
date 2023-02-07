@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Create pull request
-        if: !(endsWith(github.ref, '/master'))
+        if: ${{!(endsWith(github.ref, '/master'))}}
         uses: peter-evans/create-pull-request@v3
         with:
           branch: main
