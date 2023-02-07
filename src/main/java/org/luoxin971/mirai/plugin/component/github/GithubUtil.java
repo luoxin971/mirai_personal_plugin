@@ -7,6 +7,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.kohsuke.github.*;
+import org.luoxin971.mirai.plugin.JavaPluginMain;
+import org.luoxin971.mirai.plugin.config.GithubConstant;
+import org.luoxin971.mirai.plugin.exceptions.GithubInitFailException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -29,6 +32,7 @@ import static org.luoxin971.mirai.plugin.config.GithubConstant.*;
  * @since 2023/2/6
  */
 public class GithubUtil {
+  /** GitHub 实例 */
   public static GitHub github;
 
   public static GHRepository repo;
@@ -49,13 +53,26 @@ public class GithubUtil {
       milestoneMap = new ConcurrentHashMap<>(list.size());
       for (MilestoneCode milestone : list) {
         milestoneMap.put(
-            milestone.code, Map.entry(milestone.getMilestoneName(), milestone.getLabelColor()));
+            milestone.getCode(),
+            Map.entry(milestone.getMilestoneName(), milestone.getLabelColor()));
       }
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new GithubInitFailException(GithubConstant.INIT_FAIL_MESSAGE, e);
     }
   }
 
+  /** 重新读取配置文件进行更新 */
+  public static final void updateConfig() {
+    JavaPluginMain.INSTANCE.reloadPluginConfig(GithubConfig.INSTANCE);
+    init();
+  }
+
+  /**
+   * 根据 url 创建 issue
+   *
+   * @param url 收藏网页
+   * @return
+   */
   @SneakyThrows
   public static GHIssue createIssue(String url) {
     Connection connect = Jsoup.connect(url);
@@ -100,7 +117,7 @@ public class GithubUtil {
                   }
                 });
     issue.setMilestone(m);
-    String color = milestoneMap.get(String.valueOf(milestoneCode.charAt(0))).getValue();
+    String color = milestoneMap.get(milestoneCode).getValue();
     List<GHLabel> labels =
         labelNames.stream()
             .map(

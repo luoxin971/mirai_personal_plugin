@@ -6,13 +6,14 @@ import net.mamoe.mirai.console.data.java.JavaAutoSavePluginConfig;
 import java.util.ArrayList;
 import java.util.List;
 
+/** todo 改成 kotlin 实现，使用 @ValueDescription */
 public class GithubConfig extends JavaAutoSavePluginConfig {
 
   public static final GithubConfig INSTANCE = new GithubConfig();
 
   private GithubConfig() {
     // 文件名 xxx.yml
-    super("org.luoxin971.github.config");
+    super("GithubConfig");
   }
 
   /** 天气API请求地址，不建议修改 */

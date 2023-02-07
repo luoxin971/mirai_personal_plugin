@@ -79,6 +79,8 @@ public final class JavaPluginMain extends JavaPlugin {
     CommandManager.INSTANCE.registerCommand(MusicCommand.INSTANCE, true);
     CommandManager.INSTANCE.registerCommand(TopHotCommand.INSTANCE, true);
     CommandManager.INSTANCE.registerCommand(WeatherCommand.INSTANCE, true);
+    GithubUtil.init();
+
     eventChannel.registerListenerHost(new GithubMessageEventHandler());
   }
 
