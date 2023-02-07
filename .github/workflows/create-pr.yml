@@ -14,11 +14,10 @@ jobs:
         uses: actions/checkout@v2
       - name: Create pull request
         if: ${{!(endsWith(github.ref, '/master'))}}
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           branch: master
           title: "Automated pull request for latest changes"
           body: "This pull request was automatically created by Github Actions."
           labels: "auto-generated"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          token: ${{ secrets.GIT_TOKEN }}
