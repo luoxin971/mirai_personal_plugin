@@ -21,4 +21,6 @@ public class GithubConstant {
 
   /** repo name */
   public static final String RECORD_REPO_NAME = "luoxin971/record_db";
+
+  public static final String INIT_FAIL_MESSAGE = "Github 初始化失败";
 }

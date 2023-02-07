@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.luoxin971.mirai.plugin.JavaPluginMain.log;
 
 /**
- * 点歌，修改自 https://github.com/khjxiaogu/MiraiSongPlugin
+ * 热点
  *
  * @author: xin
  * @since: 2023/2/4

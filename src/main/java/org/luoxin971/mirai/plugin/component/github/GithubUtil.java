@@ -1,16 +1,21 @@
 package org.luoxin971.mirai.plugin.component.github;
 
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.kohsuke.github.*;
+import org.luoxin971.mirai.plugin.JavaPluginMain;
+import org.luoxin971.mirai.plugin.config.GithubConstant;
+import org.luoxin971.mirai.plugin.exceptions.GithubInitFailException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -27,13 +32,12 @@ import static org.luoxin971.mirai.plugin.config.GithubConstant.*;
  * @since 2023/2/6
  */
 public class GithubUtil {
-  public static final GitHub github;
+  /** GitHub 实例 */
+  public static GitHub github;
 
-  public static final GHRepository repo;
+  public static GHRepository repo;
 
-  public static final ConcurrentHashMap<String, String> milestoneMap;
-
-  public static final ConcurrentHashMap<String, String> colorMap;
+  public static ConcurrentHashMap<String, Map.Entry<String, String>> milestoneMap;
 
   /** 缓存 issue，以便修改 */
   public static GHIssue currentIssue;
@@ -41,32 +45,34 @@ public class GithubUtil {
   /** issue 最近更新时间 */
   public static long issueUpdateTime = 0;
 
-  static {
+  public static void init() {
     try {
-      github = GitHubBuilder.fromPropertyFile().build();
-      repo = github.getRepository(RECORD_REPO_NAME);
-      milestoneMap = new ConcurrentHashMap<>(16);
-      milestoneMap.put("1-1", "技术干货");
-      milestoneMap.put("1-2", "技术杂谈");
-      milestoneMap.put("1-3", "技术踩坑");
-      milestoneMap.put("1-4", "职场");
-      milestoneMap.put("2-1", "折腾");
-      milestoneMap.put("2-2", "tool/resource");
-      milestoneMap.put("3-1", "生活观点");
-      milestoneMap.put("3-2", "生活情调");
-      milestoneMap.put("3-3", "个人发展");
-      milestoneMap.put("3-4", "指南、评测");
-      milestoneMap.put("4-1", "其他");
-      colorMap = new ConcurrentHashMap<>(16);
-      colorMap.put("1", "F0F8FF");
-      colorMap.put("2", "FFEC8B");
-      colorMap.put("3", "EE82EE");
-      colorMap.put("4", "BEBEBE");
+      github = GitHub.connectUsingOAuth(GithubConfig.INSTANCE.token.get());
+      repo = github.getRepository(GithubConfig.INSTANCE.repo.get());
+      List<MilestoneCode> list = GithubConfig.INSTANCE.milestone.get();
+      milestoneMap = new ConcurrentHashMap<>(list.size());
+      for (MilestoneCode milestone : list) {
+        milestoneMap.put(
+            milestone.getCode(),
+            Map.entry(milestone.getMilestoneName(), milestone.getLabelColor()));
+      }
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new GithubInitFailException(GithubConstant.INIT_FAIL_MESSAGE, e);
     }
   }
 
+  /** 重新读取配置文件进行更新 */
+  public static final void updateConfig() {
+    JavaPluginMain.INSTANCE.reloadPluginConfig(GithubConfig.INSTANCE);
+    init();
+  }
+
+  /**
+   * 根据 url 创建 issue
+   *
+   * @param url 收藏网页
+   * @return
+   */
   @SneakyThrows
   public static GHIssue createIssue(String url) {
     Connection connect = Jsoup.connect(url);
@@ -93,19 +99,25 @@ public class GithubUtil {
   }
 
   @SneakyThrows
+  @NotNull
   public static GHIssue addMetaToIssue(
       GHIssue issue, String milestoneCode, List<String> labelNames) {
-    if (checkIssueExpire()) {
-      return null;
-    }
     List<GHMilestone> miles = repo.listMilestones(GHIssueState.ALL).toList();
+    String milestoneName = milestoneMap.get(milestoneCode).getKey();
     GHMilestone m =
         miles.stream()
-            .filter(x -> x.getTitle().equals(milestoneMap.get(milestoneCode)))
+            .filter(x -> x.getTitle().equals(milestoneName))
             .findAny()
-            .orElseThrow(() -> new RuntimeException("不存在该 milestone"));
+            .orElseGet(
+                () -> {
+                  try {
+                    return repo.createMilestone(milestoneName, "");
+                  } catch (IOException e) {
+                    throw new RuntimeException("不存在且无法创建该 milestone");
+                  }
+                });
     issue.setMilestone(m);
-    String color = colorMap.get(String.valueOf(milestoneCode.charAt(0)));
+    String color = milestoneMap.get(milestoneCode).getValue();
     List<GHLabel> labels =
         labelNames.stream()
             .map(
@@ -114,17 +126,15 @@ public class GithubUtil {
                     return repo.listLabels().toList().stream()
                         .filter(label -> label.getName().equals(x))
                         .findAny()
-                        .or(
+                        .orElseGet(
                             () -> {
                               try {
-                                return Optional.ofNullable(
-                                    repo.createLabel(x.toLowerCase(), color));
+                                return repo.createLabel(x.toLowerCase(), color);
                               } catch (IOException e) {
                                 log.error("创建label失败: " + x);
                                 throw new RuntimeException(e);
                               }
-                            })
-                        .get();
+                            });
                   } catch (IOException e) {
                     throw new RuntimeException(e);
                   }
@@ -134,7 +144,7 @@ public class GithubUtil {
     return repo.getIssue(issue.getNumber());
   }
 
-  /** 检查 issue 最近更新时间是否在 3mins 前 */
+  /** 检查 issue 最近更新时间是否在 3 mins 前 */
   public static boolean checkIssueExpire() {
     return System.currentTimeMillis() - GithubUtil.issueUpdateTime > VALID_ISSUE_DURATION;
   }
@@ -151,7 +161,7 @@ public class GithubUtil {
     return mat.matches();
   }
 
-  public static String transferIssueToString(GHIssue issue) {
+  public static String transferIssueToString(@NotNull GHIssue issue) {
     return String.format(
         "number: %s\ntitle: %s\nbody: %s\nurl: %s\nmilestone: %s\nlabels: %s",
         issue.getNumber(),

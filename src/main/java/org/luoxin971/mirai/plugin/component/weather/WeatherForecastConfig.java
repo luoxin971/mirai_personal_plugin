@@ -9,15 +9,15 @@ public class WeatherForecastConfig extends JavaAutoSavePluginConfig {
 
   private WeatherForecastConfig() {
     // 文件名 xxx.yml
-    super("org.luoxin971.WeatherForecast.config");
+    super("WeatherForecastConfig");
   }
 
   /** 天气API请求地址，不建议修改 */
   public final Value<String> url = value("url", "https://v0.yiketianqi.com/free/day");
 
   /** 天气api的用户id */
-  public final Value<String> appid = value("appid", "23516491");
+  public final Value<String> appid = value("appid", "12345678");
 
   /** 天气api的用户 */
-  public final Value<String> appsecret = value("appsecret", "WxV9R4zP");
+  public final Value<String> appsecret = value("appsecret", "abcdefgh");
 }
