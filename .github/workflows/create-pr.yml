@@ -1,0 +1,25 @@
+name: Create pull request
+
+on:
+  create:
+    branches:
+      - '*'
+
+jobs:
+  create_pull_request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create pull request
+        if: ${{ !(endsWith(toString(github.ref), '/master')) }}
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: main
+          title: "Automated pull request for latest changes"
+          body: "This pull request was automatically created by Github Actions."
+          labels: "auto-generated"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
