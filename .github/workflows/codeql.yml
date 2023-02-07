@@ -59,6 +59,13 @@ jobs:
       # If this step fails, then you should remove it and run the build manually (see below)
       #    - name: Autobuild
       #      uses: github/codeql-action/autobuild@v2
+      # Setup JDK
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+          cache: 'gradle'
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: Build with Gradle
