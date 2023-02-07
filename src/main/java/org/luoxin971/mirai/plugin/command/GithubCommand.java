@@ -14,6 +14,7 @@ import org.luoxin971.mirai.plugin.component.github.GithubUtil;
 import org.luoxin971.mirai.plugin.config.CommonConstant;
 import org.luoxin971.mirai.plugin.eventhandler.GithubMessageEventHandler;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -52,9 +53,15 @@ public class GithubCommand extends JRawCommand {
               .append("g <milestone> <labels...> 为链接添加milestone和label\n")
               .append("g c <comment> 为链接添加附加信息\n")
               .append("milestone 对应关系如下:\n");
-      GithubUtil.milestoneMap.forEach(
-          (key, value) ->
-              chainBuilder.append(key).append(": ").append(value.getKey()).append("\n"));
+      GithubUtil.milestoneMap.entrySet().stream()
+          .sorted(Comparator.comparing(x -> x.getKey()))
+          .forEach(
+              entry ->
+                  chainBuilder
+                      .append(entry.getKey())
+                      .append(": ")
+                      .append(entry.getValue().getKey())
+                      .append("\n"));
       context.getSender().sendMessage(chainBuilder.build());
       return;
     }
