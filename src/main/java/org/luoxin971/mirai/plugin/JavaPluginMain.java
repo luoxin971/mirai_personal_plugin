@@ -21,6 +21,8 @@ import org.luoxin971.mirai.plugin.command.GithubCommand;
 import org.luoxin971.mirai.plugin.command.MusicCommand;
 import org.luoxin971.mirai.plugin.command.TopHotCommand;
 import org.luoxin971.mirai.plugin.command.WeatherCommand;
+import org.luoxin971.mirai.plugin.component.github.GithubConfig;
+import org.luoxin971.mirai.plugin.component.github.GithubUtil;
 import org.luoxin971.mirai.plugin.component.weather.WeatherForecastConfig;
 import org.luoxin971.mirai.plugin.component.weather.WeatherForecastData;
 import org.luoxin971.mirai.plugin.eventhandler.GithubMessageEventHandler;
@@ -93,12 +95,15 @@ public final class JavaPluginMain extends JavaPlugin {
     // 设置与数据更新
     this.reloadPluginData(WeatherForecastData.INSTANCE);
     this.reloadPluginConfig(WeatherForecastConfig.INSTANCE);
+    this.reloadPluginConfig(GithubConfig.INSTANCE);
   }
 
   @Override
   public void onDisable() {
     JavaPluginMain.INSTANCE.savePluginConfig(WeatherForecastConfig.INSTANCE);
     JavaPluginMain.INSTANCE.savePluginData(WeatherForecastData.INSTANCE);
+    JavaPluginMain.INSTANCE.savePluginConfig(GithubConfig.INSTANCE);
+    GithubUtil.init();
     log.info("Plugin unloaded");
   }
 

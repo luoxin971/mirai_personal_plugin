@@ -14,6 +14,7 @@ import org.luoxin971.mirai.plugin.component.github.GithubUtil;
 import org.luoxin971.mirai.plugin.config.CommonConstant;
 import org.luoxin971.mirai.plugin.eventhandler.GithubMessageEventHandler;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +39,8 @@ public class GithubCommand extends JRawCommand {
   @Override
   @SneakyThrows
   public void onCommand(@NotNull CommandContext context, @NotNull MessageChain args) {
-    if (!CommonConstant.XIN_QQ_NUM.equals(context.getSender().getUser().getId())) {
+    if (!CommonConstant.XIN_QQ_NUM.equals(
+        Objects.requireNonNull(context.getSender().getUser()).getId())) {
       return;
     }
     int size = args.size();
@@ -50,9 +52,9 @@ public class GithubCommand extends JRawCommand {
               .append("g <milestone> <labels...> 为链接添加milestone和label\n")
               .append("g c <comment> 为链接添加附加信息\n")
               .append("milestone 对应关系如下:\n");
-      GithubUtil.milestoneMap
-          .entrySet()
-          .forEach(entry -> chainBuilder.append(entry.getKey() + ": " + entry.getValue() + "\n"));
+      GithubUtil.milestoneMap.forEach(
+          (key, value) ->
+              chainBuilder.append(key).append(": ").append(value.getKey()).append("\n"));
       context.getSender().sendMessage(chainBuilder.build());
       return;
     }
@@ -65,7 +67,7 @@ public class GithubCommand extends JRawCommand {
     // 无效指令
     if (size == 1
         || !SUBCOMMAND.equalsIgnoreCase(firstArg)
-            && !GithubUtil.milestoneMap.keySet().contains(firstArg)) {
+            && !GithubUtil.milestoneMap.containsKey(firstArg)) {
       context.getSender().sendMessage("当前指令无效，请检查参数！");
       return;
     }
