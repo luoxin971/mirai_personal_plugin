@@ -15,8 +15,6 @@ public class WeatherUtil {
 
   public static final Gson GSON = new GsonBuilder().setLenient().create();
 
-  public static final String url = "https://v0.yiketianqi.com/free/day";
-
   //  /** 重新获取PluginData中的相关数据 */
   //  public static void reloadPluginData() {
   //    Value<String> urlValue = WeatherForecastConfig.INSTANCE.url;
@@ -29,7 +27,7 @@ public class WeatherUtil {
 
   /** 发送请求获取天气，参数正确时返回ForecastInfo对象，若请求失败返回null */
   public static ForecastRes requestWeather(ForecastReq req) {
-    StringBuilder sb = new StringBuilder(url);
+    StringBuilder sb = new StringBuilder(WeatherForecastConfig.INSTANCE.url.get());
     sb.append("?unescape=1&appid=")
         .append(req.getAppId())
         .append("&appsecret=")
