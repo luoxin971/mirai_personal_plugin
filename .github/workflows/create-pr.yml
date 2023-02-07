@@ -16,7 +16,7 @@ jobs:
         if: ${{!(endsWith(github.ref, '/master'))}}
         uses: peter-evans/create-pull-request@v3
         with:
-          branch: master
+          branch: ${{ github.ref }}
           title: "Automated pull request for latest changes"
           body: "This pull request was automatically created by Github Actions."
           labels: "auto-generated"
