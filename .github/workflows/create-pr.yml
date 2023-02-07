@@ -1,0 +1,25 @@
+name: Create pull request
+
+on:
+  create:
+    branches:
+      - '*'
+
+jobs:
+  create_pull_request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create pull request
+        if: ${{!(endsWith(github.ref, '/master'))}}
+        #        这个 action 搞我，说好 create pr，你却偷偷 merge
+        #        uses: peter-evans/create-pull-request@v4
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: master
+          pr_title: "Automated pull request for latest changes ${{github.ref}}"
+          pr_body: "This pull request was automatically created by Github Actions."
+          pr_label: "auto-pr"
+          github_token: ${{ secrets.GIT_TOKEN }}
