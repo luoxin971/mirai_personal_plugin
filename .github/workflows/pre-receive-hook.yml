@@ -20,7 +20,9 @@ jobs:
         run: |
           while read oldrev newrev refname; do
             email=$(git log -1 --pretty=format:"%ae" $newrev)
+            echo "$email"
             disallowed_domains="${{ env.DISALLOWED_EMAIL_DOMAINS }}"
+            echo "$disallowed_domains"
             disallowed=0
             for disallowed_domain in $disallowed_domains; do
               if [[ $verified_email == *"$disallowed_domain" ]]; then
