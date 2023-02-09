@@ -15,7 +15,7 @@ jobs:
       - name: Get latest commit message
         run: |
           MSG=$(git log -1 --pretty=format:"%s") 
-          echo "::set-env name=COMMIT_MESSAGE::$}MSG}"
+          echo "::set-env name=COMMIT_MESSAGE::${MSG}"
       - name: Create pull request
         if: ${{!(endsWith(github.ref, '/master'))}}
         #        这个 action 搞我，说好 create pr，你却偷偷 merge
