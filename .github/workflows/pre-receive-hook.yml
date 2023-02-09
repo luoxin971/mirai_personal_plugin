@@ -18,19 +18,19 @@ jobs:
 
       - name: Validate email addresses
         run: |
-          while read oldrev newrev refname; do
-            email=$(git log -1 --pretty=format:"%ae" $newrev)
-            disallowed_domains="${{ env.DISALLOWED_EMAIL_DOMAINS }}"
-            disallowed=0
-            for disallowed_domain in $disallowed_domains; do
-              if [[ $verified_email == *"$disallowed_domain" ]]; then
-                disallowed=1
-                break
-                fi
-              done
-            if [ $disallowed -eq 1 ]; then
-              echo "ERROR: Email from a disallowed domain. Push rejected."
-              exit 1
+          email=$(git log -1 --pretty=format:"%ae")
+          echo "$email"
+          disallowed_domains="${{ env.DISALLOWED_EMAIL_DOMAINS }}"
+          echo "$disallowed_domains"
+          disallowed=0
+          for disallowed_domain in $disallowed_domains; do
+            if [[ $verified_email == *"$disallowed_domain" ]]; then
+              disallowed=1
+              break
             fi
           done
+          if [ $disallowed -eq 1 ]; then
+            echo "ERROR: Email from a disallowed domain. Push rejected."
+            exit 1
+          fi
 
