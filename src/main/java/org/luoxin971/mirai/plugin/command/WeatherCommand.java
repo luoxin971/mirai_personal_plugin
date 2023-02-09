@@ -28,9 +28,7 @@ import static org.luoxin971.mirai.plugin.JavaPluginMain.log;
  * @since: 2023/2/4
  */
 public final class WeatherCommand extends JRawCommand {
-
   public static final WeatherCommand INSTANCE = new WeatherCommand();
-
   private static final String ICON_PATH = JavaPluginMain.INSTANCE.getDataFolderPath() + "/wea_img/";
 
   public WeatherCommand() {
