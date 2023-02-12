@@ -6,7 +6,6 @@ import com.google.gson.JsonParser;
 import net.mamoe.mirai.event.EventHandler;
 import net.mamoe.mirai.event.ListeningStatus;
 import net.mamoe.mirai.event.SimpleListenerHost;
-import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.event.events.MessageEvent;
 import net.mamoe.mirai.message.data.LightApp;
 import net.mamoe.mirai.message.data.PlainText;
@@ -29,7 +28,7 @@ public class GithubMessageEventHandler extends SimpleListenerHost {
 
   /** 监听私聊消息 */
   @EventHandler
-  public ListeningStatus onFriendMessage(FriendMessageEvent event) {
+  public ListeningStatus onFriendMessage(MessageEvent event) {
     log.info(event.getMessage().serializeToMiraiCode());
     // 如果不是本人发的，就忽略
     if (!CommonConstant.XIN_QQ_NUM.equals(event.getSender().getId())) {
