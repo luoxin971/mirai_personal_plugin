@@ -26,6 +26,7 @@ import org.luoxin971.mirai.plugin.component.github.GithubUtil;
 import org.luoxin971.mirai.plugin.component.weather.WeatherForecastConfig;
 import org.luoxin971.mirai.plugin.component.weather.WeatherForecastData;
 import org.luoxin971.mirai.plugin.eventhandler.GithubMessageEventHandler;
+import org.luoxin971.mirai.plugin.eventhandler.OfflineEventHandler;
 
 import java.util.Arrays;
 import java.util.List;
@@ -82,6 +83,7 @@ public final class JavaPluginMain extends JavaPlugin {
     GithubUtil.init();
 
     eventChannel.registerListenerHost(new GithubMessageEventHandler());
+    eventChannel.registerListenerHost(new OfflineEventHandler());
   }
 
   public void handleMessage(FriendMessageEvent event) {
